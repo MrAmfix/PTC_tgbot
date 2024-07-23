@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:16.0
+    container_name: ptc_tg_base
+    environment:
+      POSTGRES_DB: "ptc_base"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "qwerty"
+    ports:
+      - "3001:3001"
+    restart: always
+
+  tg_bot:
+    container_name: tg_bot
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+    command: >
+      /bin/sh -c 'pip install psycopg2;python main.py'
