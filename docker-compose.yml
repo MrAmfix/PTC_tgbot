@@ -23,5 +23,23 @@ services:
       - 3000
     ports:
       - "3000:3000"
+    depends_on:
+      - postgres
     command: >
       /bin/sh -c 'pip install psycopg2;python main.py'
+
+  api:
+    container_name: tg_api
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    expose:
+      - 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    command: >
+      /bin/sh -c 'python api.py'

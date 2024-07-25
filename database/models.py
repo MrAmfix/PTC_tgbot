@@ -4,7 +4,7 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 
-class Users(Base):
+class User(Base):
     __tablename__ = 'users'
     userid = Column(String, primary_key=True)
     tgid = Column(String)
