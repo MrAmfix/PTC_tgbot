@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from database.models import Users, Base
+from database.models import User, Base
 from config import DB_PORT, DB_HOST, DB_PASS, DB_USER, DB_NAME, DB_ADAPTER
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -21,13 +21,13 @@ class DataBase:
     @staticmethod
     @with_session
     def get_user_tgid(userid: str, session: Session = None) -> Optional[str]:
-        user = session.query(Users).filter_by(userid=userid).first()
+        user = session.query(User).filter_by(userid=userid).first()
         return None if user is None else user.tgid
 
     @staticmethod
     @with_session
     def add_tgid_to_user(userid: str, tgid: Union[str, int], session: Session = None) -> bool:
-        user = session.query(Users).filter_by(userid=str(userid)).first()
+        user = session.query(User).filter_by(userid=str(userid)).first()
         if user is None:
             return False
         user.tgid = tgid
@@ -37,5 +37,15 @@ class DataBase:
     @staticmethod
     @with_session
     def add_userid(userid: str, session: Session = None):
-        session.add(Users(userid=userid))
-        session.commit()
+        user = session.query(User).filter_by(userid=userid).first()
+        if user is None:
+            session.add(User(userid=userid))
+            session.commit()
+            return True
+        return False
+
+
+    @staticmethod
+    @with_session
+    def check_user(userid: str, session: Session = None) -> Optional[User]:
+        return session.query(User).filter_by(userid=userid).first()

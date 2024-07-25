@@ -27,12 +27,36 @@ def send_notification():
     userid = request.args.get('userid')
     message = request.args.get('message')
     if not userid or not message:
-        return jsonify({"error": "Missing userid or message"}), 400
+        return jsonify({'error': 'Missing userid or message'}), 400
     tgid = DataBase.get_user_tgid(userid)
     if tgid is None:
-        return jsonify({"error": "User not found or Telegram ID not linked"}), 404
+        return jsonify({'error': 'User not found or Telegram ID not linked'}), 404
     run_async(send_message(int(tgid), message))
-    return jsonify({"status": "Message sent"}), 200
+    return jsonify({'status': 'Message sent'}), 200
+
+
+@app.route('/telegram/add', methods=['GET'])
+def add_user():
+    userid = request.args.get('userid')
+    if not userid:
+        return jsonify({'error': 'Missing userid'}), 400
+    if DataBase.add_userid(userid):
+        return jsonify({'status': 'User was added'}), 200
+    else:
+        return jsonify({'error': 'User already exists'}), 400
+
+
+@app.route('/telegram/check', methods=['GET'])
+def check_user():
+    userid = request.args.get('userid')
+    if not userid:
+        return jsonify({'error': 'Missing userid'}), 400
+    user = DataBase.check_user(userid)
+    if user is None:
+        return jsonify({'status': 'User does not exist'}), 200
+    else:
+        return jsonify({'status': 'User exists', 'userid': user.userid,
+                        'tgid': user.tgid, 'name': user.name}), 200
 
 
 if __name__ == '__main__':
